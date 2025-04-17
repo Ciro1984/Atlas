@@ -2,7 +2,6 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 
-
 // Configurações
 const PORT_EXPRESS = 4000; // Porta para o Express
 const MONGO_URI = "mongodb://localhost:27017/cadastro_funcoes"; // URI do MongoDB

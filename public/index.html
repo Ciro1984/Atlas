@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Pesquisa de Funções - Prevenir</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Reset e configurações base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #16a03fa4;
+            --primary-light: #16824f;
+            --secondary: #a31919;
+            --secondary-light: #d63e3e;
+            --dark: #16a03fa4;
+            --light: #ffffff;
+            --gray: #f0f2f5;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(/assets/background_2.avif);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        
+        /* Header estilizado */
+        header {
+            background-color: var(--primary);
+            color: var(--light);
+            box-shadow: var(--shadow);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-container i {
+            font-size: 2rem;
+            margin-right: 1rem;
+            color: var(--light);
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--light);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: var(--transition);
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--light);
+            transition: var(--transition);
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* Conteúdo principal */
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        .page-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--light);
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--secondary), transparent);
+        }
+        
+        .search-card {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .search-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(11, 77, 46, 0.2);
+        }
+        
+        .search-button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.8rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .search-button:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        
+        /* Resultados */
+        .result-card {
+            background-color: rgba(255, 255, 255, 0.911);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        .result-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .result-body {
+            padding: 1.5rem;
+        }
+        
+        .result-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .group-title {
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 0.5rem;
+        }
+        
+        .result-row {
+            display: flex;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 0.8rem;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            min-width: 160px;
+            color: #555555;
+        }
+        
+        .result-value {
+            flex: 1;
+        }
+        
+        .danger-info {
+            background-color: #ffebee;
+            border-left: 4px solid var(--secondary);
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 4px;
+        }
+        
+        .danger-title {
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            margin: 1rem 0;
+        }
+        
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .social-links a {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        
+        .social-links a:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            margin-top: 1rem;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            
+            .logo-container {
+                margin-bottom: 1rem;
+            }
+            
+            .search-container {
+                flex-direction: column;
+            }
+            
+            .result-row {
+                flex-direction: column;
+            }
+            
+            .result-label {
+                margin-bottom: 0.3rem;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo-container">
+                <i class="fas fa-heartbeat"></i>
+                <div class="logo-text">Prevenir - Segurança do Trabalho</div>
+            </div>
+            <nav class="nav-links">
+                <a href="#">Início</a>
+                <a href="#">Funções</a>
+                <a href="#">Relatórios</a>
+                <a href="#">Contato</a>
+            </nav>
+        </div>
+    </header>
+    
+    <main>
+        <h1 class="page-title">Sistema de Pesquisa de Funções</h1>
+        
+        <div class="search-card">
+            <div class="search-container">
+                <input type="text" id="nomeFuncao" class="search-input" placeholder="Digite o nome da função...">
+                <button onclick="buscarFuncao()" class="search-button">
+                    <i class="fas fa-search"></i>
+                    Buscar
+                </button>
+            </div>
+        </div>
+        
+        <div class="result-card">
+            <div class="result-header">
+                <h2>Resultado da Pesquisa</h2>
+            </div>
+            <div class="result-body">
+                <div class="result-group">
+                    <h3 class="group-title">Informações Gerais</h3>
+                    <div class="result-row">
+                        <div class="result-label">Função:</div>
+                        <div class="result-value" id="nome">-</div>
+                    </div>
+                </div>
+                
+                <div class="result-group">
+                    <h3 class="group-title">Exames Ocupacionais</h3>
+                    <div class="result-row">
+                        <div class="result-label">Admissional:</div>
+                        <div class="result-value" id="admissional">-</div>
+                    </div>
+                    <div class="result-row">
+                        <div class="result-label">Periódico:</div>
+                        <div class="result-value" id="periodico">-</div>
+                    </div>
+                    <div class="result-row">
+                        <div class="result-label">Retorno:</div>
+                        <div class="result-value" id="retorno">-</div>
+                    </div>
+                    <div class="result-row">
+                        <div class="result-label">Mudança de Risco:</div>
+                        <div class="result-value" id="mudanca_risco">-</div>
+                    </div>
+                    <div class="result-row">
+                        <div class="result-label">Demissional:</div>
+                        <div class="result-value" id="demissional">-</div>
+                    </div>
+                </div>
+                
+                <div class="result-group">
+                    <h3 class="group-title">Riscos Ocupacionais</h3>
+                    <div class="result-row">
+                        <div class="result-label">Acidentes:</div>
+                        <div class="result-value" id="acidentes">-</div>
+                    </div>
+                    <div class="result-row">
+                        <div class="result-label">Ergonômicos:</div>
+                        <div class="result-value" id="ergonomicos">-</div>
+                    </div>
+                    <div class="result-row">
+                        <div class="result-label">Físicos:</div>
+                        <div class="result-value" id="fisicos">-</div>
+                    </div>
+                    <div class="result-row">
+                        <div class="result-label">Biológicos:</div>
+                        <div class="result-value" id="biologicos">-</div>
+                    </div>
+                    <div class="result-row">
+                        <div class="result-label">Químicos:</div>
+                        <div class="result-value" id="quimicos">-</div>
+                    </div>
+                </div>
+                
+                <div class="danger-info">
+                    <div class="danger-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Aviso Importante
+                    </div>
+                    <p>As informações exibidas são para orientação e devem ser validadas por um profissional de saúde ocupacional.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">Prevenir Serviços de Saúde</div>
+            <div class="footer-links">
+                <a href="#">Política de Privacidade</a>
+                <a href="#">Termos de Uso</a>
+                <a href="#">Sobre Nós</a>
+                <a href="#">Suporte</a>
+            </div>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#"><i class="fab fa-whatsapp"></i></a>
+            </div>
+            <div class="copyright">
+                &copy; 2025 Developed by CSM. Prevenir Serviços de Saúde Ltda. Todos os direitos reservados.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Função para buscar função
+        async function buscarFuncao() {
+            const nomeFuncao = document.getElementById('nomeFuncao').value;
+            if (!nomeFuncao) {
+                alert("Por favor, insira o nome da função.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:4000/funcao/${nomeFuncao}`);
+                if (!response.ok) {
+                    throw new Error("Função não encontrada.");
+                }
+
+                const data = await response.json();
+                preencherDados(data);
+            } catch (error) {
+                console.error("Erro ao buscar função:", error);
+                alert(error.message);
+            }
+        }
+
+        // Função para preencher os dados na interface
+        function preencherDados(funcao) {
+            document.getElementById('nome').textContent = funcao.Funcao || "-";
+            document.getElementById('admissional').textContent = funcao.admissional || "-";
+            document.getElementById('periodico').textContent = funcao.periodico || "-";
+            document.getElementById('retorno').textContent = funcao.retorno || "-";
+            document.getElementById('mudanca_risco').textContent = funcao.mudanca_risco || "-";
+            document.getElementById('demissional').textContent = funcao.demissional || "-";
+            document.getElementById('acidentes').textContent = funcao.acidentes || "-";
+            document.getElementById('ergonomicos').textContent = funcao.ergonomicos || "-";
+            document.getElementById('fisicos').textContent = funcao.fisicos || "-";
+            document.getElementById('biologicos').textContent = funcao.biologicos || "-";
+            document.getElementById('quimicos').textContent = funcao.quimicos || "-";
+        }
+    </script>
+</body>
+</html>
